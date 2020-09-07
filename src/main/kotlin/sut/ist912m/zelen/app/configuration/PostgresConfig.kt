@@ -27,7 +27,7 @@ class PostgresConfig(
         private val version: String
 ) {
         @Bean
-        fun dataSource(): DataSource? {
+        fun dataSource(): DataSource {
                 val dataSource = HikariDataSource()
                 dataSource.username = username
                 dataSource.password = password
