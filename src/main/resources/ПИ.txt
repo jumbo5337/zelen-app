@@ -1,0 +1,82 @@
+
+
+Список ендпоинтов 
+:Вход в систему
+- Login        
+- Register  
+- Заполнить пользовательскую информацию
+- Заполнить настройки 
+- Найти пользователя 
+
+
+:Баланс
+- Внести
+- Вывести
+
+:Платёж
+- Перевести платёж
+- Запросить историю платежей
+
+Админка
+- Забалокировать пользователя
+- Отменить транзакацию
+
+
+Схема Базы данных:
+
+1. Users
+2. Persons
+3. Users_Balance
+5. Users_Operations
+6. Admin_operations
+7. User_Preferences
+
+Users											User_Preferences
+1. ID 			    : Long, PK					1. User_Id
+2. Login 			: String					2. TimeZome			: Byte
+3. Password			: String					3. Privacy			: Enum (Show_All, Show_Name, Hiden)
+4. last_seen		: Instant
+
+								
+Persons
+1. First_Name		: String
+2. Second_Name		: String
+3. Birth_Date		: String
+4. Email			: String
+5. Adress_Country	: String
+6. Adress_City		: String
+7. User_Id 			: Long PK, FK (Users)
+
+
+Users_Balance
+1. User_Id (Foreign Key, Primary Key)
+2. Balance 
+
+Users_Operations
+1: Operation_Id 	:Long  
+2: Operation_Type 	:Enum	(Deposit, WithDrowal, Transfer)
+3: First_User_Id	:Long
+4: Second_User_Id 	:Long
+5: State 			:Enum	(CREATED, COMPLETED, CANCLED)
+6: Ammount			:Int
+7: Create_time		:Instant
+8: Update_time		:Instant
+		
+Admin_operations
+1: Operation_Id
+2: Admin_Id 
+3: Operation_Type (Ban, Unban, RollBack_transaction)
+4: User_Id
+5: Timestamp		:Instant 
+6: Reason 			:Instant
+
+
+
+
+
+
+
+
+
+
+
