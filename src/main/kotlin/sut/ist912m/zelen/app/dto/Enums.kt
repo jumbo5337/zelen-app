@@ -1,9 +1,9 @@
 package sut.ist912m.zelen.app.dto
 
-enum class Role(val id: Int) {
-    USER(1),
-    ADMIN(2),
-    BLOCKED(-1);
+enum class Role(val id: Int, val value: String) {
+    USER(1, "USER"),
+    ADMIN(2, "ADMIN"),
+    BLOCKED(-1, "BLOCKED");
 
     companion object {
         @JvmStatic

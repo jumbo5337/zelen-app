@@ -45,8 +45,8 @@ class JwtTokenUtils : Serializable {
         return  getExpiration(token).isBefore(Instant.now())
     }
 
-    fun validate(token: String, userDetails: UserDetails){
-        val valid = getUsername(token) == userDetails.username && isExpired(token)
+    fun validate(token: String, userDetails: UserDetails) : Boolean{
+       return getUsername(token) == userDetails.username && isExpired(token)
     }
 
     fun generateToken(userDetails: UserDetails): String {

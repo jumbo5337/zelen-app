@@ -5,7 +5,7 @@ CREATE SEQUENCE internal_ops_id_sequence INCREMENT 1 START 25000 CACHE 10 OWNED 
 
 CREATE TABLE IF NOT EXISTS USERS (
 	ID 		  bigint NOT NULL DEFAULT nextval('user_id_sequence'::regclass),
-	USERNAME  varchar(200) NOT NULL,
+	USERNAME  varchar(200) NOT NULL UNIQUE ,
     PASSWORD  varchar(250) NOT NULL,
 	LAST_SEEN bigint NOT NULL,
 	USER_ROLE	  smallint NOT NULL,
