@@ -3,7 +3,7 @@ db:
   port: 5432
   username: postgres
   password: root
-  name: zelen
+  name: zelen-app
   version:  0.0.1
 
 jwt:
