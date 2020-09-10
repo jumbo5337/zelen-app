@@ -6,13 +6,14 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
+import sut.ist912m.zelen.app.service.UserService
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Component
 class JwtRequestFilter(
-        private val userDetailsService: JwtUserDetailsService,
+        private val userService: UserService,
         private val jwtTokenUtils: JwtTokenUtils
 ) : OncePerRequestFilter() {
 
@@ -35,7 +36,7 @@ class JwtRequestFilter(
 
                 val username = jwtTokenUtils.getUsername(jwt)
                 if (SecurityContextHolder.getContext().authentication == null) {
-                    val jwtUser = userDetailsService.loadUserByUsername(username)
+                    val jwtUser = userService.loadUserByUsername(username)
                     if (jwtTokenUtils.validate(jwt, jwtUser)) {
                         val upaToken = UsernamePasswordAuthenticationToken(
                                 jwtUser, null, jwtUser.authorities

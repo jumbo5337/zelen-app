@@ -30,5 +30,5 @@ data class UserPreferences(
 
 data class UserBalance(
         val userId : Long,
-        val balance: UserBalance
+        val balance: Double
 )

@@ -1,9 +1,7 @@
 package sut.ist912m.zelen.app.configuration
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
@@ -15,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import sut.ist912m.zelen.app.jwt.JwtAuthEntryPoint
 import sut.ist912m.zelen.app.jwt.JwtRequestFilter
-import sut.ist912m.zelen.app.jwt.JwtUserDetailsService
+import sut.ist912m.zelen.app.service.UserService
 
 
 @Configuration
@@ -23,7 +21,7 @@ import sut.ist912m.zelen.app.jwt.JwtUserDetailsService
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class WebSecurityConfig(
         val jwtAuthEntryPoint: JwtAuthEntryPoint,
-        val userDetailsService: JwtUserDetailsService,
+        val userService: UserService,
         val jwtRequestFilter: JwtRequestFilter
 ) : WebSecurityConfigurerAdapter() {
 
@@ -43,13 +41,18 @@ class WebSecurityConfig(
     }
 
     override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.userDetailsService(userDetailsService)
-                .passwordEncoder(BCryptPasswordEncoder())
+        auth.userDetailsService(userService)
+                .passwordEncoder(passwordEncoder())
     }
 
     @Bean
     override fun authenticationManagerBean(): AuthenticationManager {
         return super.authenticationManagerBean()
+    }
+
+    @Bean
+    fun passwordEncoder() : BCryptPasswordEncoder{
+        return BCryptPasswordEncoder()
     }
 
 

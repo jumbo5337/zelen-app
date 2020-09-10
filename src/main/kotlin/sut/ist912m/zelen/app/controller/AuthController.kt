@@ -5,12 +5,11 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import sut.ist912m.zelen.app.jwt.JwtRequest
 import sut.ist912m.zelen.app.jwt.JwtResponse
 import sut.ist912m.zelen.app.jwt.JwtTokenUtils
-import sut.ist912m.zelen.app.jwt.JwtUserDetailsService
+import sut.ist912m.zelen.app.service.UserService
 import javax.servlet.http.HttpServletRequest
 
 
@@ -22,7 +21,7 @@ import javax.servlet.http.HttpServletRequest
 )
 class AuthController(
         private val jwtUtils: JwtTokenUtils,
-        private val userDetailsService: JwtUserDetailsService,
+        private val userService: UserService,
         private val authManager: AuthenticationManager
 ) {
 
@@ -30,7 +29,7 @@ class AuthController(
     fun generateAuthenticationToken(@RequestBody authenticationRequest: JwtRequest): ResponseEntity<*> {
         val (username, password) = authenticationRequest
         authManager.authenticate(UsernamePasswordAuthenticationToken(username, password))
-        val userDetails = userDetailsService.loadUserByUsername(authenticationRequest.username)
+        val userDetails = userService.loadUserByUsername(authenticationRequest.username)
         val token: String = jwtUtils.generateToken(userDetails)
         return ResponseEntity.ok(JwtResponse(token))
     }
@@ -44,7 +43,7 @@ class AuthController(
             ResponseEntity.badRequest().body(response)
         } else {
             val username = jwtUtils.getUsername(token)
-            val user = userDetailsService.loadUserByUsername(username)
+            val user = userService.loadUserByUsername(username)
             val newToken = jwtUtils.generateToken(user)
             ResponseEntity.ok(JwtResponse(newToken))
         }
