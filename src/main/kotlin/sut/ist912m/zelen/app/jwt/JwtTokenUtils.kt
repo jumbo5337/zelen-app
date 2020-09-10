@@ -37,9 +37,9 @@ class JwtTokenUtils : Serializable {
         return getAllClaimsFromToken(token).expiration.toInstant()
     }
 
-//    fun getUserId(token: String) : Long {
-//        return getClaim(token) { claims -> claims["userId"] as Long }
-//    }
+    fun getUserId(token: String) : Long {
+        return getAllClaimsFromToken(token)["userId"] as Long
+    }
 
     fun isExpired(token: String): Boolean {
         return  getExpiration(token).isBefore(Instant.now())
@@ -49,8 +49,9 @@ class JwtTokenUtils : Serializable {
        return getUsername(token) == userDetails.username && !isExpired(token)
     }
 
-    fun generateToken(userDetails: UserDetails): String {
-        val claims: Map<String, Any> = HashMap()
+    fun generateToken(userDetails: JwtUser): String {
+        val claims = mutableMapOf<String, Any>()
+        claims["userId"] = userDetails.user.id
         return doGenerateToken(claims, userDetails.username)
     }
 

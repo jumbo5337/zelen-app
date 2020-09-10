@@ -3,8 +3,8 @@ package sut.ist912m.zelen.app.jwt
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import sut.ist912m.zelen.app.dto.Role
-import sut.ist912m.zelen.app.dto.User
+import sut.ist912m.zelen.app.entity.Role
+import sut.ist912m.zelen.app.entity.User
 
 data class JwtUser(
         val user: User

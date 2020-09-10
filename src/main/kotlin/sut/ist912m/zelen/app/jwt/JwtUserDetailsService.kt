@@ -12,7 +12,7 @@ class JwtUserDetailsService(
 ) : UserDetailsService {
 
     //TODO add null handling
-    override fun loadUserByUsername(userName: String): UserDetails {
+    override fun loadUserByUsername(userName: String): JwtUser {
         val user = userRepository.findByUsername(userName)
                 ?: throw UsernameNotFoundException("User with username [$userName]")
         return JwtUser(user)

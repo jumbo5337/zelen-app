@@ -4,12 +4,11 @@ import net.minidev.json.JSONObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.bcrypt.BCrypt
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
-import sut.ist912m.zelen.app.dto.Role
+import sut.ist912m.zelen.app.entity.Role
 import sut.ist912m.zelen.app.dto.UserCreateRequest
 import sut.ist912m.zelen.app.repository.UserRepository
 
@@ -22,7 +21,6 @@ import sut.ist912m.zelen.app.repository.UserRepository
 class UserController(
         val userRepository: UserRepository
 ) {
-    private val passwordEncoder = BCryptPasswordEncoder()
 
     @RequestMapping(value = ["/create"], method = [RequestMethod.POST])
     fun refreshToken(@RequestBody form: UserCreateRequest): ResponseEntity<*> {

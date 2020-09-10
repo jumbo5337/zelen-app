@@ -24,28 +24,30 @@ class JwtRequestFilter(
             filter: FilterChain
     ) {
         val token = request.getHeader("Authorization")
-        var jwt: String? = null
-        var username: String? = null
-        if (!token.isNullOrEmpty() && token.startsWith("Bearer ")) {
-            jwt = token.substring(7)
-            username = jwtTokenUtils.getUsername(jwt)
-        } else {
-            log.warn("JWT Token does not begin with Bearer String")
-        }
-        if (username != null &&
-                jwt != null &&
-                SecurityContextHolder.getContext().authentication == null
-        ) {
-            val jwtUser = userDetailsService.loadUserByUsername(username)
-            if (jwtTokenUtils.validate(jwt, jwtUser)) {
-                val upaToken = UsernamePasswordAuthenticationToken(
-                        jwtUser, null, jwtUser.authorities
-                )
-                upaToken.details = WebAuthenticationDetailsSource().buildDetails(request)
-                SecurityContextHolder.getContext().authentication = upaToken
+        if (!token.isNullOrEmpty()) {
+            val jwt = if (token.startsWith("Bearer ")) {
+                token.substring(7)
+            } else {
+                log.warn("JWT Token does not begin with Bearer String")
+                token
+            }
+            try {
+                val username = jwtTokenUtils.getUsername(jwt)
+                if (SecurityContextHolder.getContext().authentication == null) {
+                    val jwtUser = userDetailsService.loadUserByUsername(username)
+                    if (jwtTokenUtils.validate(jwt, jwtUser)) {
+                        val upaToken = UsernamePasswordAuthenticationToken(
+                                jwtUser, null, jwtUser.authorities
+                        )
+                        upaToken.details = WebAuthenticationDetailsSource().buildDetails(request)
+                        SecurityContextHolder.getContext().authentication = upaToken
+                    }
+                }
+                filter.doFilter(request, response)
+            } catch (exc : Exception) {
+                log.error("Unable to load User Information from JWT. Authorization Failed")
             }
         }
-        filter.doFilter(request, response)
     }
 
 

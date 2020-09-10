@@ -1,4 +1,4 @@
-package sut.ist912m.zelen.app.dto
+package sut.ist912m.zelen.app.entity
 
 enum class Role(val id: Int, val value: String) {
     USER(1, "USER"),

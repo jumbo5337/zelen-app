@@ -1,4 +1,4 @@
-package sut.ist912m.zelen.app.dto
+package sut.ist912m.zelen.app.entity
 
 import java.time.Instant
 

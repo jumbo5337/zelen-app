@@ -1,4 +1,4 @@
-package sut.ist912m.zelen.app.dto
+package sut.ist912m.zelen.app.entity
 
 import java.time.Instant
 import java.time.LocalDate
@@ -28,8 +28,7 @@ data class UserPreferences(
         val privacy: Privacy
 )
 
-data class UserCreateRequest(
-        val username: String,
-        val password1: String,
-        val password2: String
+data class UserBalance(
+        val userId : Long,
+        val balance: UserBalance
 )

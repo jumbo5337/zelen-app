@@ -1,12 +1,11 @@
 package sut.ist912m.zelen.app.repository
 
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.queryForObject
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert
 import org.springframework.stereotype.Repository
-import sut.ist912m.zelen.app.dto.Role
-import sut.ist912m.zelen.app.dto.User
+import sut.ist912m.zelen.app.entity.Role
+import sut.ist912m.zelen.app.entity.User
 import java.sql.ResultSet
 import java.time.Instant
 import javax.sql.DataSource
