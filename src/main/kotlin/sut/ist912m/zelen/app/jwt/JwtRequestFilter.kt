@@ -28,13 +28,10 @@ class JwtRequestFilter(
         var username: String? = null
         if (!token.isNullOrEmpty() && token.startsWith("Bearer ")) {
             jwt = token.substring(7)
-            username = kotlin.runCatching {
-                jwtTokenUtils.getUsername(jwt)
-            }.getOrNull()
+            username = jwtTokenUtils.getUsername(jwt)
         } else {
             log.warn("JWT Token does not begin with Bearer String")
         }
-
         if (username != null &&
                 jwt != null &&
                 SecurityContextHolder.getContext().authentication == null
@@ -45,7 +42,7 @@ class JwtRequestFilter(
                         jwtUser, null, jwtUser.authorities
                 )
                 upaToken.details = WebAuthenticationDetailsSource().buildDetails(request)
-                SecurityContextHolder.getContext().authentication == upaToken
+                SecurityContextHolder.getContext().authentication = upaToken
             }
         }
         filter.doFilter(request, response)

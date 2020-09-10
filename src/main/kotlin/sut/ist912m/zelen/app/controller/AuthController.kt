@@ -1,14 +1,12 @@
 package sut.ist912m.zelen.app.controller
 
 import net.minidev.json.JSONObject
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import sut.ist912m.zelen.app.dto.JwtRequest
 import sut.ist912m.zelen.app.dto.JwtResponse
 import sut.ist912m.zelen.app.jwt.JwtTokenUtils
@@ -16,14 +14,19 @@ import sut.ist912m.zelen.app.jwt.JwtUserDetailsService
 import javax.servlet.http.HttpServletRequest
 
 
-@RestController("api/v1/uaa")
+@RestController
+@RequestMapping(
+        path = ["/api/v1/auth"],
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+)
 class AuthController(
         private val jwtUtils: JwtTokenUtils,
         private val userDetailsService: JwtUserDetailsService,
         private val authManager: AuthenticationManager
 ) {
 
-    @RequestMapping(value = ["/authenticate"], method = [RequestMethod.POST])
+    @RequestMapping(value = ["/token"], method = [RequestMethod.POST])
     fun generateAuthenticationToken(@RequestBody authenticationRequest: JwtRequest): ResponseEntity<*> {
         val (username, password) = authenticationRequest
         authManager.authenticate(UsernamePasswordAuthenticationToken(username, password))
@@ -33,7 +36,7 @@ class AuthController(
         return ResponseEntity.ok(JwtResponse(token))
     }
 
-    @RequestMapping(value = ["/refresh"], method = [RequestMethod.POST])
+    @RequestMapping(value = ["/refresh"], method = [RequestMethod.GET])
     fun refreshToken(request: HttpServletRequest): ResponseEntity<*> {
         val token = request.getHeader("Authorization").substring(7)
         return if (jwtUtils.isExpired(token)) {

@@ -26,27 +26,27 @@ class JwtTokenUtils : Serializable {
 
 
     fun getUsername(token: String) : String{
-        return getClaim(token) { claims -> claims.subject }
+       return getAllClaimsFromToken(token).subject
     }
 
     fun getIssuedAt(token: String) : Instant {
-        return getClaim(token) { claims -> claims.issuedAt.toInstant() }
+        return getAllClaimsFromToken(token).issuedAt.toInstant()
     }
 
     fun getExpiration(token: String) : Instant {
-        return getClaim(token) { claims -> claims.expiration.toInstant() }
+        return getAllClaimsFromToken(token).expiration.toInstant()
     }
 
-    fun getUserId(token: String) : Long {
-        return getClaim(token) { claims -> claims["userId"] as Long }
-    }
+//    fun getUserId(token: String) : Long {
+//        return getClaim(token) { claims -> claims["userId"] as Long }
+//    }
 
     fun isExpired(token: String): Boolean {
         return  getExpiration(token).isBefore(Instant.now())
     }
 
     fun validate(token: String, userDetails: UserDetails) : Boolean{
-       return getUsername(token) == userDetails.username && isExpired(token)
+       return getUsername(token) == userDetails.username && !isExpired(token)
     }
 
     fun generateToken(userDetails: UserDetails): String {
@@ -58,11 +58,6 @@ class JwtTokenUtils : Serializable {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(Date(System.currentTimeMillis()))
                 .setExpiration(Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret).compact()
-    }
-
-    fun <T> getClaim(token: String, block: (Claims) -> T) : T {
-        val claims = getAllClaimsFromToken(token)
-        return block.invoke(claims)
     }
 
     fun getAllClaimsFromToken(token: String): Claims {

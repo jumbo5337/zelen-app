@@ -19,7 +19,7 @@ class UserRepository(
     private val jdbcTemplate = JdbcTemplate(dataSource)
     private val queryInsertUser = SimpleJdbcInsert(jdbcTemplate)
             .withTableName("USERS")
-            .usingGeneratedKeyColumns("ID")
+            .usingGeneratedKeyColumns("id")
     private val queryUpdatePassword = "UPDATE USERS SET PASSWORD=? WHERE ID=?"
     private val queryUpdateLastSeen = "UPDATE USERS SET LAST_SEEN=? WHERE ID=?"
     private val querySelectById = "SELECT * FROM USERS WHERE ID=?"
@@ -45,25 +45,21 @@ class UserRepository(
     }
 
     fun findById(id: Long): User? {
-        return jdbcTemplate.queryForObject(querySelectById, listOf(id)){ rs: ResultSet, rowNum: Int -> mapRow(rs, rowNum) }
+        return jdbcTemplate.queryForObject(querySelectById, id){ rs: ResultSet, rowNum: Int -> mapRow(rs, rowNum) }
     }
 
     fun findByUsername(username: String): User? {
-        return jdbcTemplate.queryForObject(querySelectByUsername, listOf(username)) { rs: ResultSet, rowNum: Int -> mapRow(rs, rowNum) }
+        return jdbcTemplate.queryForObject(querySelectByUsername, username) { rs: ResultSet, rowNum: Int -> mapRow(rs, rowNum) }
     }
 
     fun mapRow(rs: ResultSet, rowNum: Int): User? {
-        return if (!rs.next()) {
-            null
-        } else {
-            User(
-              id = rs.getLong("ID"),
-              username = rs.getString("USERNAME"),
-              password = rs.getString("PASSWORD"),
-              role = Role.byId(rs.getInt("USER_ROLE")),
-              lastSeen = Instant.ofEpochMilli(rs.getLong("LAST_SEEN")),
-              registerTime = Instant.ofEpochMilli(rs.getLong("REG_DATE"))
+        return User(
+              id = rs.getLong("id"),
+              username = rs.getString("username"),
+              password = rs.getString("password"),
+              role = Role.byId(rs.getInt("user_role")),
+              lastSeen = Instant.ofEpochMilli(rs.getLong("last_seen")),
+              registerTime = Instant.ofEpochMilli(rs.getLong("reg_date"))
             )
         }
     }
-}
