@@ -1,6 +1,8 @@
 package sut.ist912m.zelen.app.configuration
 
 import com.zaxxer.hikari.HikariDataSource
+import org.flywaydb.core.Flyway
+import org.flywaydb.core.api.MigrationVersion
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -33,12 +35,12 @@ class PostgresConfig(
                 return dataSource
         }
 
-//        @Bean(initMethod = "migrate")
-//        fun flyway(dataSource: DataSource?): Flyway? {
-//                val flyway = Flyway()
-//                flyway.dataSource = dataSource
-//                flyway.target = MigrationVersion.fromVersion(version)
-//                return flyway
-//        }
+        @Bean(initMethod = "migrate")
+        fun flyway(dataSource: DataSource?): Flyway {
+                val flyway = Flyway()
+                flyway.dataSource = dataSource
+                flyway.target = MigrationVersion.LATEST
+                return flyway
+        }
 
 }

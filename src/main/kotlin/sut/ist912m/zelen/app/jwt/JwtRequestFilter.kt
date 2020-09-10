@@ -24,14 +24,15 @@ class JwtRequestFilter(
             filter: FilterChain
     ) {
         val token = request.getHeader("Authorization")
-        if (!token.isNullOrEmpty()) {
-            val jwt = if (token.startsWith("Bearer ")) {
-                token.substring(7)
-            } else {
-                log.warn("JWT Token does not begin with Bearer String")
-                token
-            }
-            try {
+        try {
+            if (!token.isNullOrEmpty()) {
+                val jwt = if (token.startsWith("Bearer ")) {
+                    token.substring(7)
+                } else {
+                    log.warn("JWT Token does not begin with Bearer String")
+                    token
+                }
+
                 val username = jwtTokenUtils.getUsername(jwt)
                 if (SecurityContextHolder.getContext().authentication == null) {
                     val jwtUser = userDetailsService.loadUserByUsername(username)
@@ -43,11 +44,13 @@ class JwtRequestFilter(
                         SecurityContextHolder.getContext().authentication = upaToken
                     }
                 }
-                filter.doFilter(request, response)
-            } catch (exc : Exception) {
-                log.error("Unable to load User Information from JWT. Authorization Failed")
             }
+        } catch (exc: Exception) {
+            log.error("Unable to load User Information from JWT. Authorization Failed")
+        } finally {
+            filter.doFilter(request, response)
         }
+
     }
 
 

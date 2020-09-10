@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.queryForObject
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert
 import org.springframework.stereotype.Repository
+import org.springframework.util.StringUtils
 import sut.ist912m.zelen.app.entity.Role
 import sut.ist912m.zelen.app.entity.User
 import java.sql.ResultSet
@@ -21,8 +22,8 @@ class UserRepository(
             .usingGeneratedKeyColumns("id")
     private val queryUpdatePassword = "UPDATE USERS SET PASSWORD=? WHERE ID=?"
     private val queryUpdateLastSeen = "UPDATE USERS SET LAST_SEEN=? WHERE ID=?"
-    private val querySelectById = "SELECT * FROM USERS WHERE ID=?"
-    private val querySelectByUsername = "SELECT * FROM USERS WHERE USERNAME=?"
+    private val querySelectById = "SELECT ${userFieldsArr.joinToString(", ") { it }} FROM USERS WHERE ID=?"
+    private val querySelectByUsername = "SELECT ${userFieldsArr.joinToString(", ") { it }} FROM USERS WHERE USERNAME=?"
 
     fun createUser(username: String, password: String, role: Role): Long {
         val params = mapOf(
@@ -44,7 +45,7 @@ class UserRepository(
     }
 
     fun findById(id: Long): User? {
-        return jdbcTemplate.queryForObject(querySelectById, id){ rs: ResultSet, rowNum: Int -> mapRow(rs, rowNum) }
+        return jdbcTemplate.queryForObject(querySelectById, id) { rs: ResultSet, rowNum: Int -> mapRow(rs, rowNum) }
     }
 
     fun findByUsername(username: String): User? {
@@ -53,12 +54,24 @@ class UserRepository(
 
     fun mapRow(rs: ResultSet, rowNum: Int): User? {
         return User(
-              id = rs.getLong("id"),
-              username = rs.getString("username"),
-              password = rs.getString("password"),
-              role = Role.byId(rs.getInt("user_role")),
-              lastSeen = Instant.ofEpochMilli(rs.getLong("last_seen")),
-              registerTime = Instant.ofEpochMilli(rs.getLong("reg_date"))
-            )
-        }
+                id = rs.getLong("id"),
+                username = rs.getString("username"),
+                password = rs.getString("password"),
+                role = Role.byId(rs.getInt("user_role")),
+                lastSeen = Instant.ofEpochMilli(rs.getLong("last_seen")),
+                registerTime = Instant.ofEpochMilli(rs.getLong("reg_date"))
+        )
     }
+
+    companion object {
+        private val userFieldsArr = arrayOf<String>(
+                "username",
+                "password",
+                "reg_date",
+                "id",
+                "user_role",
+                "last_seen"
+        )
+    }
+
+}

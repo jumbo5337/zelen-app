@@ -4,7 +4,7 @@ db:
   username: postgres
   password: root
   name: zelen-app
-  version:  0.0.1
+  version:  0.0.2
 
 jwt:
   secret: zelen

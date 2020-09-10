@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS USERS (
 	LAST_SEEN bigint NOT NULL,
 	REG_DATE bigint not null,
 	USER_ROLE	  smallint NOT NULL,
+    SECRET_CODE varchar(250) NOT NULL,
 	PRIMARY KEY (ID)
 );
 
