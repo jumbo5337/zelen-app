@@ -15,9 +15,10 @@ import sut.ist912m.zelen.app.repository.UserRepository
 
 @Component
 class UserService(
-        private val userRepository: UserRepository,
-        private val pswdEncoder: BCryptPasswordEncoder
+        private val userRepository: UserRepository
 ) : UserDetailsService {
+
+    private val  pswdEncoder = BCryptPasswordEncoder()
 
     //TODO add null handling
     override fun loadUserByUsername(userName: String): JwtUser {

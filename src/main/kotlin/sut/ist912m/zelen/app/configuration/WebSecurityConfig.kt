@@ -34,6 +34,7 @@ class WebSecurityConfig(
                 .and().authorizeRequests()
                 .antMatchers(
                         "/api/v1/users/create",
+                        "/api/v1/users/reset-password",
                         "/api/v1/auth/token"
                 ).permitAll()
                 .anyRequest().authenticated()
