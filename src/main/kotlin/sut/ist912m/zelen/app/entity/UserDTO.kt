@@ -9,6 +9,7 @@ data class User (
         val password: String,
         val registerTime : Instant,
         val lastSeen: Instant,
+        val secret: String,
         val role: Role
 )
 

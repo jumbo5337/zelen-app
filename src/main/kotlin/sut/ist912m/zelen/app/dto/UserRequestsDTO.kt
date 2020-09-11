@@ -5,18 +5,25 @@ import java.time.LocalDate
 data class UserCreateRequest(
         val username: String,
         val password1: String,
-        val password2: String
+        val password2: String,
+        val secretCode: String
 )
 
-data class UserNewPasswordRequest(
+data class UserResetPasswordRequest(
+        val username: String,
         val password1: String,
-        val password2: String
+        val password2: String,
+        val secretCode: String
 )
 
 data class UserChangePasswordRequest(
         val oldPassword: String,
         val password1: String,
         val password2: String
+)
+
+data class UserChangeSecretRequest(
+        val secretCode: String
 )
 
 data class UserInfoRequest(

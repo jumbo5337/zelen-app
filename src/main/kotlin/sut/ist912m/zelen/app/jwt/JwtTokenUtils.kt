@@ -24,29 +24,28 @@ class JwtTokenUtils : Serializable {
     private lateinit var secret: String
 
 
-
-    fun getUsername(token: String) : String{
-       return getAllClaimsFromToken(token).subject
+    fun getUsername(token: String): String {
+        return getAllClaimsFromToken(token).subject
     }
 
-    fun getIssuedAt(token: String) : Instant {
+    fun getIssuedAt(token: String): Instant {
         return getAllClaimsFromToken(token).issuedAt.toInstant()
     }
 
-    fun getExpiration(token: String) : Instant {
+    fun getExpiration(token: String): Instant {
         return getAllClaimsFromToken(token).expiration.toInstant()
     }
 
-    fun getUserId(token: String) : Long {
+    fun getUserId(token: String): Long {
         return getAllClaimsFromToken(token)["userId"] as Long
     }
 
     fun isExpired(token: String): Boolean {
-        return  getExpiration(token).isBefore(Instant.now())
+        return getExpiration(token).isBefore(Instant.now())
     }
 
-    fun validate(token: String, userDetails: UserDetails) : Boolean{
-       return getUsername(token) == userDetails.username && !isExpired(token)
+    fun validate(token: String, userDetails: UserDetails): Boolean {
+        return getUsername(token) == userDetails.username && !isExpired(token)
     }
 
     fun generateToken(userDetails: JwtUser): String {
@@ -62,9 +61,19 @@ class JwtTokenUtils : Serializable {
     }
 
     fun getAllClaimsFromToken(token: String): Claims {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body
+
+        return Jwts.parser().setSigningKey(secret)
+                .parseClaimsJws(token.removePrefix()).body
     }
 
+    private fun String.removePrefix(): String {
+        return if (this.startsWith("Bearer ")) {
+                    this.substring(7)
+               } else {
+                   this
+               }
+
+    }
 
 
 }
