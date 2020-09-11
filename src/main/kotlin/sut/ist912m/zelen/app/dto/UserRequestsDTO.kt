@@ -1,5 +1,7 @@
 package sut.ist912m.zelen.app.dto
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import java.time.LocalDate
 
 data class UserCreateRequest(

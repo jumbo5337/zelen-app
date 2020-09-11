@@ -10,6 +10,7 @@ import sut.ist912m.zelen.app.dto.UserCreateRequest
 import sut.ist912m.zelen.app.dto.UserResetPasswordRequest
 import sut.ist912m.zelen.app.jwt.JwtTokenUtils
 import sut.ist912m.zelen.app.service.UserService
+import sut.ist912m.zelen.app.utils.generateResponse
 
 @RestController
 @RequestMapping(
@@ -25,44 +26,43 @@ class UserController(
     @RequestMapping(value = ["/create"], method = [RequestMethod.POST])
     fun createUser(@RequestBody form: UserCreateRequest): ResponseEntity<*> {
         val userId = userService.createUser(form)
-        val jsonResponse = JSONObject()
-        jsonResponse.appendField("id", userId)
-        jsonResponse.appendField("username", form.username)
+        val jsonResponse = generateResponse(
+                "id" to userId,
+                "username" to form.username)
         return ResponseEntity.ok(jsonResponse)
     }
 
     @RequestMapping(value = ["/change-password"], method = [RequestMethod.POST])
     fun updatePassword(
-            @RequestHeader("Authorization") jwt : String,
+            @RequestHeader("Authorization") jwt: String,
             @RequestBody form: UserChangePasswordRequest
     ): ResponseEntity<*> {
         val userId = jwtTokenUtils.getUserId(jwt)
         userService.changePassword(userId, form)
-        val jsonResponse = JSONObject()
-        jsonResponse.appendField("message", "Update User [$userId] password successful")
-        return ResponseEntity.ok(jsonResponse)
+        val response = generateResponse(
+                "message" to "Update User [${userId}] password successful")
+        return ResponseEntity.ok(response)
     }
 
     @RequestMapping(value = ["/reset-password"], method = [RequestMethod.POST])
     fun resetPassword(@RequestBody form: UserResetPasswordRequest): ResponseEntity<*> {
         userService.resetPassword(form)
-        val jsonResponse = JSONObject()
-        jsonResponse.appendField("message", "Update User [${form.username}] password successful")
-        return ResponseEntity.ok(jsonResponse)
+        val response = generateResponse(
+                "message" to "Update User [${form.username}] password successful")
+        return ResponseEntity.ok(response)
     }
 
     @RequestMapping(value = ["/update-secret"], method = [RequestMethod.POST])
     fun updateSecret(
-            @RequestHeader("Authorization") jwt : String,
+            @RequestHeader("Authorization") jwt: String,
             @RequestBody form: UserChangeSecretRequest
     ): ResponseEntity<*> {
         val userId = jwtTokenUtils.getUserId(jwt)
         userService.userChangeSecret(userId, form)
-        val jsonResponse = JSONObject()
-        jsonResponse.appendField("message", "Update User [$userId] secret successful")
+        val jsonResponse =  generateResponse(
+                "message" to "Update User [$userId] secret successful")
         return ResponseEntity.ok(jsonResponse)
     }
-
 
 
 }

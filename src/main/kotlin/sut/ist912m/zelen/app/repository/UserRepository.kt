@@ -80,7 +80,7 @@ class UserRepository(
         return jdbcTemplate.queryForObject(querySelectByUsername, username) { rs: ResultSet, rowNum: Int -> mapRow(rs, rowNum) }
     }
 
-    fun mapRow(rs: ResultSet, rowNum: Int): User? {
+    private fun mapRow(rs: ResultSet, rowNum: Int): User? {
         return User(
                 id = rs.getLong("id"),
                 username = rs.getString("username"),
@@ -93,7 +93,7 @@ class UserRepository(
     }
 
     companion object {
-        private val userFieldsArr = arrayOf<String>(
+        private val userFieldsArr = arrayOf(
                 "username",
                 "password",
                 "reg_date",

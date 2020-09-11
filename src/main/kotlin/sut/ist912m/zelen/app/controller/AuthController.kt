@@ -10,6 +10,7 @@ import sut.ist912m.zelen.app.jwt.JwtRequest
 import sut.ist912m.zelen.app.jwt.JwtResponse
 import sut.ist912m.zelen.app.jwt.JwtTokenUtils
 import sut.ist912m.zelen.app.service.UserService
+import sut.ist912m.zelen.app.utils.generateResponse
 import javax.servlet.http.HttpServletRequest
 
 
@@ -39,8 +40,7 @@ class AuthController(
     fun refreshToken(request: HttpServletRequest): ResponseEntity<*> {
         val token = request.getHeader("Authorization").substring(7)
         return if (jwtUtils.isExpired(token)) {
-            val response = JSONObject()
-            response.appendField("message", "Token is expired")
+            val response = generateResponse("message" to "Token is expired")
             ResponseEntity.badRequest().body(response)
         } else {
             val username = jwtUtils.getUsername(token)

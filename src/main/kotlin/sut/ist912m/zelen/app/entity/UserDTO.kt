@@ -16,11 +16,11 @@ data class User (
 data class UserInfo(
         val userId : Long,
         val firstName : String,
-        val secondName: String,
+        val lastName: String,
         val email: String,
+        val birthDate : LocalDate,
         val country : String?,
-        val birthDate : LocalDate?,
-        val city : String
+        val city : String?
 )
 
 data class UserPreferences(

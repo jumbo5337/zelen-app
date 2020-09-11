@@ -4,6 +4,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import sut.ist912m.zelen.app.dto.UserChangePasswordRequest
 import sut.ist912m.zelen.app.dto.UserChangeSecretRequest
 import sut.ist912m.zelen.app.dto.UserCreateRequest
@@ -11,11 +12,13 @@ import sut.ist912m.zelen.app.dto.UserResetPasswordRequest
 import sut.ist912m.zelen.app.entity.Role
 import sut.ist912m.zelen.app.exceptions.VerificationException
 import sut.ist912m.zelen.app.jwt.JwtUser
+import sut.ist912m.zelen.app.repository.BalanceRepository
 import sut.ist912m.zelen.app.repository.UserRepository
 
-@Component
+@Service
 class UserService(
-        private val userRepository: UserRepository
+        private val userRepository: UserRepository,
+        private val balanceRepository: BalanceRepository
 ) : UserDetailsService {
 
     private val  pswdEncoder = BCryptPasswordEncoder()
@@ -31,13 +34,14 @@ class UserService(
         val salt = BCrypt.gensalt(8)
         val password = BCrypt.hashpw(form.password1, salt)
         val secret = BCrypt.hashpw(form.secretCode, salt)
-        return userRepository.createUser(
+        val userId = userRepository.createUser(
                 username = form.username,
                 password = password,
                 role = Role.USER,
                 secret = secret
         )
-
+        balanceRepository.createAccount(userId)
+        return userId
     }
 
     fun changePassword(
