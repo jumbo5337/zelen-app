@@ -17,16 +17,7 @@ data class UserInfo(
         val userId : Long,
         val firstName : String,
         val lastName: String,
-        val email: String,
-        val birthDate : LocalDate,
-        val country : String?,
-        val city : String?
-)
-
-data class UserPreferences(
-        val userId: Long,
-        val timeShift: String,
-        val privacy: Privacy
+        val email: String
 )
 
 data class UserBalance(

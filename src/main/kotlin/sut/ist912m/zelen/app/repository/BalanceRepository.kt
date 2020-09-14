@@ -18,7 +18,7 @@ class BalanceRepository(
             .withTableName("USER_BALANCE")
     private val queryGetAccount = "SELECT * FROM USER_BALANCE WHERE user_id=?"
 
-    fun createAccount(userId:Long){
+    fun createBalance(userId:Long){
         val params = mapOf(
                 "user_id" to userId,
                 "balance" to 50

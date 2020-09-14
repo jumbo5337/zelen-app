@@ -3,25 +3,23 @@ package sut.ist912m.zelen.app.service
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
-import sut.ist912m.zelen.app.dto.UserChangePasswordRequest
-import sut.ist912m.zelen.app.dto.UserChangeSecretRequest
-import sut.ist912m.zelen.app.dto.UserCreateRequest
-import sut.ist912m.zelen.app.dto.UserResetPasswordRequest
+import sut.ist912m.zelen.app.dto.*
 import sut.ist912m.zelen.app.entity.Role
 import sut.ist912m.zelen.app.exceptions.VerificationException
 import sut.ist912m.zelen.app.jwt.JwtUser
 import sut.ist912m.zelen.app.repository.BalanceRepository
+import sut.ist912m.zelen.app.repository.UserInfoRepository
 import sut.ist912m.zelen.app.repository.UserRepository
 
 @Service
 class UserService(
         private val userRepository: UserRepository,
+        private val userInfoRepository: UserInfoRepository,
         private val balanceRepository: BalanceRepository
 ) : UserDetailsService {
 
-    private val  pswdEncoder = BCryptPasswordEncoder()
+    private val pswdEncoder = BCryptPasswordEncoder()
 
     //TODO add null handling
     override fun loadUserByUsername(userName: String): JwtUser {
@@ -40,7 +38,7 @@ class UserService(
                 role = Role.USER,
                 secret = secret
         )
-        balanceRepository.createAccount(userId)
+        balanceRepository.createBalance(userId)
         return userId
     }
 
@@ -83,6 +81,29 @@ class UserService(
         userRepository.updateLastSeen(userId)
     }
 
+    fun createUserInfo(
+            userId: Long,
+            form: UserInfoRequest
+    ) {
+        userInfoRepository.createUserInfo(
+                userId = userId,
+                firstName = form.firstName,
+                lastName = form.secondName,
+                email = form.email
+        )
+    }
+
+    fun updateUserInfo(
+            userId: Long,
+            form: UserInfoRequest
+    ) {
+        userInfoRepository.updateUserInfo(
+                userId = userId,
+                firstName = form.firstName,
+                lastName = form.secondName,
+                email = form.email
+        )
+    }
 
     private fun verifyPasswords(p1: String, p2: String) {
         if (p1 != p2) {

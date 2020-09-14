@@ -37,7 +37,7 @@ class JwtTokenUtils : Serializable {
     }
 
     fun getUserId(token: String): Long {
-        return (getAllClaimsFromToken(token)["userId"] as Int).toLong()
+        return getAllClaimsFromToken(token)["userId"] as Long
     }
 
     fun isExpired(token: String): Boolean {

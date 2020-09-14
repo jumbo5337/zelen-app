@@ -2,6 +2,8 @@ package sut.ist912m.zelen.app.configuration
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
+import org.springframework.format.Formatter
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
@@ -14,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import sut.ist912m.zelen.app.jwt.JwtAuthEntryPoint
 import sut.ist912m.zelen.app.jwt.JwtRequestFilter
 import sut.ist912m.zelen.app.service.UserService
+import java.time.LocalDate
 
 
 @Configuration
@@ -55,7 +58,5 @@ class WebSecurityConfig(
     fun passwordEncoder() : BCryptPasswordEncoder{
         return BCryptPasswordEncoder()
     }
-
-
 
 }
