@@ -2,6 +2,7 @@ package sut.ist912m.zelen.app.service
 
 import org.springframework.stereotype.Service
 import sut.ist912m.zelen.app.dto.TransferRequest
+import sut.ist912m.zelen.app.dto.TransferResponse
 import sut.ist912m.zelen.app.entity.OpState
 import sut.ist912m.zelen.app.entity.OpType
 import sut.ist912m.zelen.app.entity.Operation
@@ -9,18 +10,22 @@ import sut.ist912m.zelen.app.entity.UserBalance
 import sut.ist912m.zelen.app.exceptions.BadOperationException
 import sut.ist912m.zelen.app.repository.BalanceRepository
 import sut.ist912m.zelen.app.repository.OperationRepository
+import sut.ist912m.zelen.app.repository.UserInfoRepository
 import sut.ist912m.zelen.app.repository.UserRepository
+import kotlin.math.abs
 
 @Service
 class OperationService(
-        val balanceRepository: BalanceRepository,
-        val operationRepository: OperationRepository
+       private val balanceRepository: BalanceRepository,
+       private val operationRepository: OperationRepository,
+       private val userInfoRepository: UserInfoRepository
 ) {
 
     private val feePercent = 0.015
 
     fun deposit(userId: Long, amount: Double): Operation {
-        balanceRepository.updateBalance(userId, amount)
+        val (_, currentBalance) = balanceRepository.getBalance(userId)
+        balanceRepository.updateBalance(userId, currentBalance + amount)
         val operationId = operationRepository.create(
                 senderId = userId,
                 receiverId = userId,
@@ -35,11 +40,11 @@ class OperationService(
 
     fun withdrawal(userId: Long, amount: Double): Operation {
         val (_, currentBalance) = balanceRepository.getBalance(userId)
-        if (currentBalance < amount.calcFee()){
+        if (currentBalance < amount.calcFee()) {
             throw BadOperationException("Balance is too low for this operation")
         }
-        balanceRepository.updateBalance(userId, amount)
-        val operationId =  operationRepository.create(
+        balanceRepository.updateBalance(userId, currentBalance - amount.calcFee())
+        val operationId = operationRepository.create(
                 senderId = userId,
                 receiverId = userId,
                 type = OpType.WITHDRAWAL,
@@ -51,30 +56,58 @@ class OperationService(
         return operationRepository.findById(operationId)!!
     }
 
-    fun createTransfer(userId: Long, form : TransferRequest) : Operation {
+    fun createTransfer(userId: Long, form: TransferRequest): TransferResponse {
         val (_, currentBalance) = balanceRepository.getBalance(userId)
         val (receiver, amount) = form
-        val receiverBalance = balanceRepository.findBalance(receiver) ?:
-                throw BadOperationException("User with id [${receiver}] doesn't exists")
-        if (currentBalance < amount.calcFee()){
+        val receiverBalance = balanceRepository.findBalance(receiver)
+                ?: throw BadOperationException("User with id [${receiver}] doesn't exists")
+        if (currentBalance < amount.calcFee()) {
             throw BadOperationException("Balance is too low for this operation")
         }
-        val operationId =  operationRepository.create(
+        val operationId = operationRepository.create(
                 senderId = userId,
-                receiverId = userId,
+                receiverId = form.receiverId,
                 type = OpType.WITHDRAWAL,
                 income = -amount.calcFee(),
                 outcome = amount,
                 fee = amount.fee(),
                 state = OpState.CREATED
         )
-        return operationRepository.findById(operationId)!!
+        val operation = operationRepository.findById(operationId)!!
+        val userInfo = userInfoRepository.findById(form.receiverId)
+        return TransferResponse(operation, userInfo)
     }
 
-    // TODO write confirm transfer
+    fun confirmTransfer(userId: Long, opId: Long): TransferResponse {
+        val operation = operationRepository.findById(opId)
+                ?: throw BadOperationException("Operation with id [$opId] doesn't exist")
+        if (operation.opType != OpType.TRANSFER) {
+            throw BadOperationException("Wrong method for transfer")
+        }
+        val (_, currentBalance) = balanceRepository.getBalance(userId)
+        if (currentBalance < abs(operation.income)) {
+            throw BadOperationException("Balance is too low for this operation")
+        }
+        val (_, receiverBalance) = balanceRepository.getBalance(operation.receiverId)
+        balanceRepository.updateBalance(userId, currentBalance + operation.income)
+        balanceRepository.updateBalance(operation.receiverId, receiverBalance + operation.outcome)
+        operationRepository.update(opId, OpState.COMPLETED)
+        val finalOp = operationRepository.findById(opId)!!
+        val receiverInfo = userInfoRepository.findById(finalOp.receiverId)
+        return TransferResponse(finalOp, receiverInfo)
+    }
+
+    fun cancelTransfer(userId: Long, opId: Long): TransferResponse {
+        operationRepository.findById(opId)
+                ?: throw BadOperationException("Operation with id [$opId] doesn't exist")
+        operationRepository.update(opId, OpState.CANCELED)
+        val finalOp = operationRepository.findById(opId)!!
+        val receiverInfo = userInfoRepository.findById(finalOp.receiverId)
+        return TransferResponse(finalOp, receiverInfo)
+    }
 
 
-    private fun Double.calcFee() : Double = this + this * feePercent
-    private fun Double.fee() : Double = this * feePercent
+    private fun Double.calcFee(): Double = this + this * feePercent
+    private fun Double.fee(): Double = this * feePercent
 
 }
