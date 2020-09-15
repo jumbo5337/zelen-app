@@ -63,12 +63,14 @@ class UserInfoRepository(
 
 
     private fun mapRow(rs: ResultSet, rowNum: Int): UserInfo? {
-        return UserInfo(
-                userId = rs.getLong("user_id"),
-                firstName = rs.getString("first_name"),
-                lastName = rs.getString("last_name"),
-                email = rs.getString("email")
-        )
+        return kotlin.runCatching {
+            UserInfo(
+                    userId = rs.getLong("user_id"),
+                    firstName = rs.getString("first_name"),
+                    lastName = rs.getString("last_name"),
+                    email = rs.getString("email")
+            )
+        }.getOrNull()
     }
 
     companion object {

@@ -1,6 +1,5 @@
 package sut.ist912m.zelen.app.controller
 
-import net.minidev.json.JSONObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
