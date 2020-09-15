@@ -27,6 +27,10 @@ class BalanceRepository(
         queryInsertAccount.execute(params)
     }
 
+    fun updateBalance(userId: Long, amount: Double){
+        jdbcTemplate.update(updateUserBalance, amount, userId)
+    }
+
     fun getBalance(userId:Long) : UserBalance{
       return jdbcTemplate.queryForObject(queryGetAccount, userId) { rs: ResultSet, rowNum: Int ->
            UserBalance(
@@ -34,6 +38,17 @@ class BalanceRepository(
                    balance = rs.getDouble("balance")
            )
        }
+    }
+
+    fun findBalance(userId:Long) : UserBalance?{
+        return kotlin.runCatching {
+            jdbcTemplate.queryForObject(queryGetAccount, userId) { rs: ResultSet, rowNum: Int ->
+                UserBalance(
+                        userId = rs.getLong("user_id"),
+                        balance = rs.getDouble("balance")
+                )
+            }
+        }.getOrNull()
     }
 
 

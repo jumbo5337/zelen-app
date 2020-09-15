@@ -15,3 +15,6 @@ class VerificationException(msg : String) : RuntimeException(msg)
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class TokenExpiredException(msg : String) : RuntimeException(msg)
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BadOperationException(msg: String) : RuntimeException(msg)
