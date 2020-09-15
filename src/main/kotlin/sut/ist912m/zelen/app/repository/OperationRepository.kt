@@ -75,7 +75,7 @@ class OperationRepository(
             Operation(
                     id = rs.getLong("id"),
                     senderId = rs.getLong("sender_id"),
-                    receiverId = rs.getLong("sender_id"),
+                    receiverId = rs.getLong("receiver_id"),
                     opState = OpState.byId(rs.getByte("OP_STATE").toInt()),
                     opType = OpType.byId(rs.getByte("OP_TYPE").toInt()),
                     income = rs.getDouble("income"),

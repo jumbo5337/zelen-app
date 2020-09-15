@@ -57,8 +57,11 @@ class OperationService(
     }
 
     fun createTransfer(userId: Long, form: TransferRequest): TransferResponse {
-        val (_, currentBalance) = balanceRepository.getBalance(userId)
         val (receiver, amount) = form
+        if (receiver == userId) {
+           throw BadOperationException("Self-transfers are prohibited")
+        }
+        val (_, currentBalance) = balanceRepository.getBalance(userId)
         val receiverBalance = balanceRepository.findBalance(receiver)
                 ?: throw BadOperationException("User with id [${receiver}] doesn't exists")
         if (currentBalance < amount.calcFee()) {
@@ -66,8 +69,8 @@ class OperationService(
         }
         val operationId = operationRepository.create(
                 senderId = userId,
-                receiverId = form.receiverId,
-                type = OpType.WITHDRAWAL,
+                receiverId = receiver,
+                type = OpType.TRANSFER,
                 income = -amount.calcFee(),
                 outcome = amount,
                 fee = amount.fee(),
@@ -79,18 +82,21 @@ class OperationService(
     }
 
     fun confirmTransfer(userId: Long, opId: Long): TransferResponse {
+        val (_, currentBalance) = balanceRepository.getBalance(userId)
         val operation = operationRepository.findById(opId)
                 ?: throw BadOperationException("Operation with id [$opId] doesn't exist")
         if (operation.opType != OpType.TRANSFER) {
             throw BadOperationException("Wrong method for transfer")
-        }
-        val (_, currentBalance) = balanceRepository.getBalance(userId)
-        if (currentBalance < abs(operation.income)) {
+        } else if (operation.opState != OpState.CREATED) {
+            throw BadOperationException("Operation is already [${operation.opState}]")
+        } else if (currentBalance < abs(operation.income)) {
             throw BadOperationException("Balance is too low for this operation")
         }
         val (_, receiverBalance) = balanceRepository.getBalance(operation.receiverId)
-        balanceRepository.updateBalance(userId, currentBalance + operation.income)
-        balanceRepository.updateBalance(operation.receiverId, receiverBalance + operation.outcome)
+        val senderBalance = currentBalance.plus(operation.income)
+        val receiverNB = receiverBalance.plus(operation.outcome)
+        balanceRepository.updateBalance(userId, senderBalance)
+        balanceRepository.updateBalance(operation.receiverId,receiverNB)
         operationRepository.update(opId, OpState.COMPLETED)
         val finalOp = operationRepository.findById(opId)!!
         val receiverInfo = userInfoRepository.findById(finalOp.receiverId)

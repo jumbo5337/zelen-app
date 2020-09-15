@@ -50,8 +50,8 @@ class OperationController(
         return ResponseEntity.ok(receipt)
     }
 
-    @RequestMapping(value = ["/deposit"], method = [RequestMethod.PUT])
-    fun deposit(@RequestHeader("Authorization") jwt: String,
+    @RequestMapping(value = ["/transfer"], method = [RequestMethod.PUT])
+    fun confirm(@RequestHeader("Authorization") jwt: String,
                 @RequestBody form: ConfirmRequest
     ): ResponseEntity<*> {
         val userId = jwtTokenUtils.getUserId(jwt)
