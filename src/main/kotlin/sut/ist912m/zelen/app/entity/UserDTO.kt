@@ -24,3 +24,15 @@ data class UserBalance(
         val userId : Long,
         val balance: Double
 )
+
+data class UserProfile(
+        val userId: Long,
+        val username: String,
+        val registerTime : Instant,
+        val lastSeen: Instant,
+        val role: Role,
+        val firstName : String,
+        val lastName: String,
+        val email: String,
+        val balance: Double
+)

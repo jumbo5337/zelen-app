@@ -6,7 +6,10 @@ data class UserCreateRequest(
         val username: String,
         val password1: String,
         val password2: String,
-        val secretCode: String
+        val secretCode: String,
+        val firstName : String,
+        val secondName: String,
+        val email: String
 )
 
 data class UserResetPasswordRequest(

@@ -6,6 +6,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import sut.ist912m.zelen.app.dto.*
 import sut.ist912m.zelen.app.entity.Role
+import sut.ist912m.zelen.app.entity.UserBalance
+import sut.ist912m.zelen.app.entity.UserProfile
 import sut.ist912m.zelen.app.exceptions.VerificationException
 import sut.ist912m.zelen.app.jwt.JwtUser
 import sut.ist912m.zelen.app.repository.BalanceRepository
@@ -37,6 +39,12 @@ class UserService(
                 password = password,
                 role = Role.USER,
                 secret = secret
+        )
+        userInfoRepository.createUserInfo(
+                userId = userId,
+                firstName = form.firstName,
+                lastName = form.secondName,
+                email = form.email
         )
         balanceRepository.createBalance(userId)
         return userId
@@ -81,18 +89,6 @@ class UserService(
         userRepository.updateLastSeen(userId)
     }
 
-    fun createUserInfo(
-            userId: Long,
-            form: UserInfoRequest
-    ) {
-        userInfoRepository.createUserInfo(
-                userId = userId,
-                firstName = form.firstName,
-                lastName = form.secondName,
-                email = form.email
-        )
-    }
-
     fun updateUserInfo(
             userId: Long,
             form: UserInfoRequest
@@ -103,6 +99,28 @@ class UserService(
                 lastName = form.secondName,
                 email = form.email
         )
+    }
+
+    fun getUserProfile(userId: Long) : UserProfile {
+        val user = userRepository.getById(userId)
+        val userInfo = userInfoRepository.findById(userId)
+        val balance = balanceRepository.getBalance(userId)
+        return UserProfile(
+                userId = user.id,
+                username = user.username,
+                registerTime = user.registerTime,
+                lastSeen = user.lastSeen,
+                role = user.role,
+                firstName = userInfo.firstName,
+                lastName = userInfo.lastName,
+                email = userInfo.email,
+                balance = balance.balance
+        )
+
+    }
+
+    fun getUserBalance(userId: Long) : UserBalance {
+       return balanceRepository.getBalance(userId)
     }
 
     private fun verifyPasswords(p1: String, p2: String) {

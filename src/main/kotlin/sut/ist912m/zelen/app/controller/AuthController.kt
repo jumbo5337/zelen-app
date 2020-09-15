@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.web.bind.annotation.*
+import sut.ist912m.zelen.app.dto.UserCreateRequest
+import sut.ist912m.zelen.app.dto.UserResetPasswordRequest
 import sut.ist912m.zelen.app.jwt.JwtRequest
 import sut.ist912m.zelen.app.jwt.JwtResponse
 import sut.ist912m.zelen.app.jwt.JwtTokenUtils
@@ -45,9 +47,27 @@ class AuthController(
         } else {
             val username = jwtUtils.getUsername(token)
             val user = userService.loadUserByUsername(username)
+            userService.updateLastSeen(user.user.id)
             val newToken = jwtUtils.generateToken(user)
             ResponseEntity.ok(JwtResponse(newToken))
         }
+    }
+
+    @RequestMapping(value = ["/register"], method = [RequestMethod.POST])
+    fun createUser(@RequestBody form: UserCreateRequest): ResponseEntity<*> {
+        val userId = userService.createUser(form)
+        val jsonResponse = generateResponse(
+                "id" to userId,
+                "username" to form.username)
+        return ResponseEntity.ok(jsonResponse)
+    }
+
+    @RequestMapping(value = ["/reset-password"], method = [RequestMethod.POST])
+    fun resetPassword(@RequestBody form: UserResetPasswordRequest): ResponseEntity<*> {
+        userService.resetPassword(form)
+        val response = generateResponse(
+                "message" to "Update password for User [${form.username}] -> successful")
+        return ResponseEntity.ok(response)
     }
 
 

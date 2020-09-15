@@ -24,7 +24,7 @@ class UserInfoRepository(
     private val jdbcTemplate = JdbcTemplate(dataSource)
     private val queryInsertUI = SimpleJdbcInsert(jdbcTemplate)
             .withTableName("USER_INFO")
-    private val querySelectById = "SELECT ${userInfoFieldsArr.joinToString(", ") { it }} FROM USERS WHERE ID=?"
+    private val querySelectById = "SELECT ${userInfoFieldsArr.joinToString(", ") { it }} FROM USER_INFO WHERE user_id=?"
     private val queryUpdateUserInfo = "UPDATE USER_INFO SET first_name=?, last_name=?, email=? WHERE user_id=?"
 
     fun createUserInfo(
@@ -41,7 +41,7 @@ class UserInfoRepository(
         )
         try {
             queryInsertUI.execute(params)
-        } catch(exc: DuplicateKeyException) {
+        } catch (exc: DuplicateKeyException) {
             throw EntityAlreadyExistsException("UserInfo for user with id [${userId}] already exists")
         }
     }
@@ -52,25 +52,24 @@ class UserInfoRepository(
             lastName: String,
             email: String
     ) {
-        jdbcTemplate.update(queryUpdateUserInfo, firstName, lastName,email,userId)
+        jdbcTemplate.update(queryUpdateUserInfo, firstName, lastName, email, userId)
     }
 
-    fun findById(userId: Long): UserInfo? {
+    fun findById(userId: Long): UserInfo {
         return jdbcTemplate.queryForObject(querySelectById, userId) { rs: ResultSet, rowNum: Int ->
             mapRow(rs, rowNum)
         }
     }
 
 
-    private fun mapRow(rs: ResultSet, rowNum: Int): UserInfo? {
-        return kotlin.runCatching {
-            UserInfo(
-                    userId = rs.getLong("user_id"),
-                    firstName = rs.getString("first_name"),
-                    lastName = rs.getString("last_name"),
-                    email = rs.getString("email")
-            )
-        }.getOrNull()
+    private fun mapRow(rs: ResultSet, rowNum: Int): UserInfo {
+        return UserInfo(
+                userId = rs.getLong("user_id"),
+                firstName = rs.getString("first_name"),
+                lastName = rs.getString("last_name"),
+                email = rs.getString("email")
+        )
+
     }
 
     companion object {

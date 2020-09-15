@@ -46,8 +46,8 @@ class OperationRepository(
                 "OUTCOME" to outcome,
                 "FEE" to fee,
                 "OP_STATE" to state.id,
-                "CREATED" to Instant.now().epochSecond,
-                "UPDATED" to Instant.now().epochSecond
+                "CREATED" to Instant.now().toEpochMilli(),
+                "UPDATED" to Instant.now().toEpochMilli()
         )
         return insertQuery.executeAndReturnKey(params).toLong()
     }
@@ -81,8 +81,8 @@ class OperationRepository(
                     income = rs.getDouble("income"),
                     outcome = rs.getDouble("outcome"),
                     fee = rs.getDouble("fee"),
-                    created = Instant.ofEpochSecond(rs.getLong("created")),
-                    updated = Instant.ofEpochSecond(rs.getLong("updated"))
+                    created = Instant.ofEpochMilli(rs.getLong("created")),
+                    updated = Instant.ofEpochMilli(rs.getLong("updated"))
             )
         }.getOrNull()
     }

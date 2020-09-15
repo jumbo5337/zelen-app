@@ -36,8 +36,8 @@ class WebSecurityConfig(
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeRequests()
                 .antMatchers(
-                        "/api/v1/users/create",
-                        "/api/v1/users/reset-password",
+                        "/api/v1/auth/register",
+                        "/api/v1/auth/reset-password",
                         "/api/v1/auth/token"
                 ).permitAll()
                 .anyRequest().authenticated()

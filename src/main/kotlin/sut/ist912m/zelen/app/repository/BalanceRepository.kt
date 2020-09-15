@@ -17,6 +17,7 @@ class BalanceRepository(
     private val queryInsertAccount = SimpleJdbcInsert(jdbcTemplate)
             .withTableName("USER_BALANCE")
     private val queryGetAccount = "SELECT * FROM USER_BALANCE WHERE user_id=?"
+    private val updateUserBalance = "UPDATE USER_BALANCE SET balance=? WHERE user_id=?"
 
     fun createBalance(userId:Long){
         val params = mapOf(

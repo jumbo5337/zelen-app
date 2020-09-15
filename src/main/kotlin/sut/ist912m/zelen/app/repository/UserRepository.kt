@@ -38,8 +38,8 @@ class UserRepository(
         val params = mapOf(
                 "USERNAME" to username,
                 "PASSWORD" to password,
-                "LAST_SEEN" to Instant.now().epochSecond,
-                "REG_DATE" to Instant.now().epochSecond,
+                "LAST_SEEN" to Instant.now().toEpochMilli(),
+                "REG_DATE" to Instant.now().toEpochMilli(),
                 "SECRET_CODE" to secret,
                 "USER_ROLE" to role.id
         )
@@ -55,7 +55,7 @@ class UserRepository(
     }
 
     fun updateLastSeen(id: Long) {
-        jdbcTemplate.update(queryUpdateLastSeen, Instant.now().epochSecond, id)
+        jdbcTemplate.update(queryUpdateLastSeen, Instant.now().toEpochMilli(), id)
     }
 
     fun updateSecretCode(id: Long, secret: String) {
