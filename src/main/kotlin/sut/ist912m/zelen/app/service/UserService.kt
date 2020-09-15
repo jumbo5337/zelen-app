@@ -5,12 +5,11 @@ import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import sut.ist912m.zelen.app.dto.*
-import sut.ist912m.zelen.app.entity.Role
-import sut.ist912m.zelen.app.entity.UserBalance
-import sut.ist912m.zelen.app.entity.UserProfile
+import sut.ist912m.zelen.app.entity.*
 import sut.ist912m.zelen.app.exceptions.VerificationException
 import sut.ist912m.zelen.app.jwt.JwtUser
 import sut.ist912m.zelen.app.repository.BalanceRepository
+import sut.ist912m.zelen.app.repository.OperationRepository
 import sut.ist912m.zelen.app.repository.UserInfoRepository
 import sut.ist912m.zelen.app.repository.UserRepository
 
@@ -18,7 +17,8 @@ import sut.ist912m.zelen.app.repository.UserRepository
 class UserService(
         private val userRepository: UserRepository,
         private val userInfoRepository: UserInfoRepository,
-        private val balanceRepository: BalanceRepository
+        private val balanceRepository: BalanceRepository,
+        private val operationRepository: OperationRepository
 ) : UserDetailsService {
 
     private val pswdEncoder = BCryptPasswordEncoder()
@@ -121,6 +121,28 @@ class UserService(
 
     fun getUserBalance(userId: Long) : UserBalance {
        return balanceRepository.getBalance(userId)
+    }
+
+    fun getUserTransfers(userId: Long) : List<Receipt> {
+        val userOperations = operationRepository.findUserOperations(userId, OpType.TRANSFER)
+        if(userOperations.isEmpty()) return emptyList()
+        val idOpMap = userOperations.associate { operation ->
+            if(operation.receiverId == userId) {
+                operation to operation.senderId
+            } else {
+                operation to operation.receiverId
+            }
+        }
+        val receiversInfo = userInfoRepository.findByIds(idOpMap.values.toList()).associateBy { it.userId }
+        return idOpMap.map { (op, id) -> Receipt(op, receiversInfo[id]!!) }
+    }
+
+    fun getUserDeposits(userId: Long) : List<Operation> {
+        return operationRepository.findUserOperations(userId, OpType.DEPOSIT)
+    }
+
+    fun getUserWithdrawals(userId: Long) : List<Operation> {
+        return operationRepository.findUserOperations(userId, OpType.WITHDRAWAL)
     }
 
     private fun verifyPasswords(p1: String, p2: String) {

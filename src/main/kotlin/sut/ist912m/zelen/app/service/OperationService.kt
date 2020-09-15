@@ -2,16 +2,14 @@ package sut.ist912m.zelen.app.service
 
 import org.springframework.stereotype.Service
 import sut.ist912m.zelen.app.dto.TransferRequest
-import sut.ist912m.zelen.app.dto.TransferResponse
+import sut.ist912m.zelen.app.dto.Receipt
 import sut.ist912m.zelen.app.entity.OpState
 import sut.ist912m.zelen.app.entity.OpType
 import sut.ist912m.zelen.app.entity.Operation
-import sut.ist912m.zelen.app.entity.UserBalance
 import sut.ist912m.zelen.app.exceptions.BadOperationException
 import sut.ist912m.zelen.app.repository.BalanceRepository
 import sut.ist912m.zelen.app.repository.OperationRepository
 import sut.ist912m.zelen.app.repository.UserInfoRepository
-import sut.ist912m.zelen.app.repository.UserRepository
 import kotlin.math.abs
 
 @Service
@@ -56,7 +54,7 @@ class OperationService(
         return operationRepository.findById(operationId)!!
     }
 
-    fun createTransfer(userId: Long, form: TransferRequest): TransferResponse {
+    fun createTransfer(userId: Long, form: TransferRequest): Receipt {
         val (receiver, amount) = form
         if (receiver == userId) {
            throw BadOperationException("Self-transfers are prohibited")
@@ -78,10 +76,10 @@ class OperationService(
         )
         val operation = operationRepository.findById(operationId)!!
         val userInfo = userInfoRepository.findById(form.receiverId)
-        return TransferResponse(operation, userInfo)
+        return Receipt(operation, userInfo)
     }
 
-    fun confirmTransfer(userId: Long, opId: Long): TransferResponse {
+    fun confirmTransfer(userId: Long, opId: Long): Receipt {
         val (_, currentBalance) = balanceRepository.getBalance(userId)
         val operation = operationRepository.findById(opId)
                 ?: throw BadOperationException("Operation with id [$opId] doesn't exist")
@@ -100,16 +98,16 @@ class OperationService(
         operationRepository.update(opId, OpState.COMPLETED)
         val finalOp = operationRepository.findById(opId)!!
         val receiverInfo = userInfoRepository.findById(finalOp.receiverId)
-        return TransferResponse(finalOp, receiverInfo)
+        return Receipt(finalOp, receiverInfo)
     }
 
-    fun cancelTransfer(userId: Long, opId: Long): TransferResponse {
+    fun cancelTransfer(userId: Long, opId: Long): Receipt {
         operationRepository.findById(opId)
                 ?: throw BadOperationException("Operation with id [$opId] doesn't exist")
         operationRepository.update(opId, OpState.CANCELED)
         val finalOp = operationRepository.findById(opId)!!
         val receiverInfo = userInfoRepository.findById(finalOp.receiverId)
-        return TransferResponse(finalOp, receiverInfo)
+        return Receipt(finalOp, receiverInfo)
     }
 
 

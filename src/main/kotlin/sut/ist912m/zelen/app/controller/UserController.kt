@@ -4,6 +4,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import sut.ist912m.zelen.app.dto.*
+import sut.ist912m.zelen.app.entity.OpType
 import sut.ist912m.zelen.app.jwt.JwtTokenUtils
 import sut.ist912m.zelen.app.service.UserService
 import sut.ist912m.zelen.app.utils.generateResponse
@@ -70,6 +71,27 @@ class UserController(
                 "message" to "Update info for User [$userId] -> successful")
         return ResponseEntity.ok(jsonResponse)
     }
+
+    @RequestMapping(value = ["/operations"], method = [RequestMethod.POST])
+    fun findUserOperations(
+            @RequestHeader("Authorization") jwt: String,
+            @RequestBody form: OperationsRequest
+    ) : ResponseEntity<*> {
+        val userId = jwtTokenUtils.getUserId(jwt)
+        val responseList : List<Any> = when (OpType.byId(form.opType)){
+            OpType.WITHDRAWAL -> userService.getUserWithdrawals(userId)
+            OpType.DEPOSIT -> userService.getUserDeposits(userId)
+            OpType.TRANSFER -> userService.getUserTransfers(userId)
+
+        }
+        return ResponseEntity.ok(responseList)
+    }
+
+
+
+
+
+
 
 
 }

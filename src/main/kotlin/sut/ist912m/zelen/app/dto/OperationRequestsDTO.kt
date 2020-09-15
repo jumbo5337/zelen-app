@@ -11,12 +11,16 @@ data class IORequest (
         val amount : Double
 )
 
+data class OperationsRequest(
+        val opType: Int
+)
+
 data class TransferRequest (
         val receiverId : Long,
         val amount: Double
 )
 
-data class TransferResponse (
+data class Receipt (
         val operation: Operation,
         val receiverInfo: UserInfo
 )

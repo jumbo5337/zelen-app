@@ -2,6 +2,9 @@ package sut.ist912m.zelen.app.repository
 
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.core.query
 import org.springframework.jdbc.core.queryForObject
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert
 import org.springframework.stereotype.Repository
@@ -22,9 +25,11 @@ class UserInfoRepository(
 ) {
 
     private val jdbcTemplate = JdbcTemplate(dataSource)
+    private val namedJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
     private val queryInsertUI = SimpleJdbcInsert(jdbcTemplate)
             .withTableName("USER_INFO")
     private val querySelectById = "SELECT ${userInfoFieldsArr.joinToString(", ") { it }} FROM USER_INFO WHERE user_id=?"
+    private val querySelectByIds = "SELECT ${userInfoFieldsArr.joinToString(", ") { it }} FROM USER_INFO WHERE user_id IN (:ids)"
     private val queryUpdateUserInfo = "UPDATE USER_INFO SET first_name=?, last_name=?, email=? WHERE user_id=?"
 
     fun createUserInfo(
@@ -57,6 +62,14 @@ class UserInfoRepository(
 
     fun findById(userId: Long): UserInfo {
         return jdbcTemplate.queryForObject(querySelectById, userId) { rs: ResultSet, rowNum: Int ->
+            mapRow(rs, rowNum)
+        }
+    }
+
+    fun findByIds(ids: List<Long>): List<UserInfo> {
+        val params = MapSqlParameterSource()
+        params.addValue("ids", ids)
+        return namedJdbcTemplate.query(querySelectByIds, params) { rs: ResultSet, rowNum: Int ->
             mapRow(rs, rowNum)
         }
     }

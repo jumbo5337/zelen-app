@@ -27,7 +27,7 @@ class OperationRepository(
     private val updateQuery = "UPDATE USER_OPERATIONS SET op_state=?, updated=? WHERE  id=?"
     private val selectQuery = "SELECT * FROM USER_OPERATIONS WHERE id=?"
     private val findAllUserOperations = "SELECT DISTINCT * FROM USER_OPERATIONS " +
-            "WHERE sender_id = :id OR receiver_id =:id"
+            "WHERE sender_id = :id OR receiver_id =:id AND op_type=:type"
 
     fun create(
             senderId: Long,
@@ -62,9 +62,10 @@ class OperationRepository(
         }
     }
 
-    fun findUserOperations(userId: Long): List<Operation> {
+    fun findUserOperations(userId: Long, type: OpType): List<Operation> {
         val params = MapSqlParameterSource()
         params.addValue("id", userId)
+        params.addValue("type", type.id)
         return jdbcTemplateNamed.query(findAllUserOperations, params) { rs: ResultSet, rowNum: Int ->
             mapRow(rs, rowNum)
         }
