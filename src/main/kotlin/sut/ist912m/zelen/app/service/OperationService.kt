@@ -22,6 +22,9 @@ class OperationService(
     private val feePercent = 0.015
 
     fun deposit(userId: Long, amount: Double): Operation {
+        if (amount < 0) {
+            throw BadOperationException("Enter a valid amount")
+        }
         val (_, currentBalance) = balanceRepository.getBalance(userId)
         balanceRepository.updateBalance(userId, currentBalance + amount)
         val operationId = operationRepository.create(
@@ -41,6 +44,9 @@ class OperationService(
         if (currentBalance < amount.calcFee()) {
             throw BadOperationException("Balance is too low for this operation")
         }
+        if (amount < 0) {
+            throw BadOperationException("Enter a valid amount")
+        }
         balanceRepository.updateBalance(userId, currentBalance - amount.calcFee())
         val operationId = operationRepository.create(
                 senderId = userId,
@@ -58,6 +64,9 @@ class OperationService(
         val (receiver, amount) = form
         if (receiver == userId) {
            throw BadOperationException("Self-transfers are prohibited")
+        }
+        if (form.amount < 0) {
+            throw BadOperationException("Enter a valid amount")
         }
         val (_, currentBalance) = balanceRepository.getBalance(userId)
         val receiverBalance = balanceRepository.findBalance(receiver)

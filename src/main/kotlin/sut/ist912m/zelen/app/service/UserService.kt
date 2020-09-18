@@ -31,6 +31,7 @@ class UserService(
 
     fun createUser(form: UserCreateRequest): Long {
         verifyPasswords(form.password1, form.password2)
+        verifyEmail(form.email)
         val salt = BCrypt.gensalt(8)
         val password = BCrypt.hashpw(form.password1, salt)
         val secret = BCrypt.hashpw(form.secretCode, salt)
@@ -93,6 +94,7 @@ class UserService(
             userId: Long,
             form: UserInfoRequest
     ) {
+        verifyEmail(form.email)
         userInfoRepository.updateUserInfo(
                 userId = userId,
                 firstName = form.firstName,
@@ -151,5 +153,11 @@ class UserService(
         }
     }
 
+    private fun verifyEmail(email : String){
+        val regex = Regex("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$")
+        if(!regex.matches(email)){
+            throw VerificationException("Email is invalid")
+        }
+    }
 
 }
