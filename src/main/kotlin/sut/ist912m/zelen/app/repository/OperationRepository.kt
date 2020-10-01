@@ -57,9 +57,11 @@ class OperationRepository(
     }
 
     fun findById(opId: Long): Operation? {
-        return jdbcTemplate.queryForObject(selectQuery, opId) { rs: ResultSet, rowNum: Int ->
-            mapRow(rs, rowNum)
-        }
+        return kotlin.runCatching {
+            jdbcTemplate.queryForObject(selectQuery, opId) { rs: ResultSet, rowNum: Int ->
+                mapRow(rs, rowNum)
+            }
+        }.getOrNull()
     }
 
     fun findUserOperations(userId: Long, type: OpType): List<Operation> {

@@ -68,7 +68,9 @@ class UserRepository(
     }
 
     fun findById(id: Long): User? {
-        return jdbcTemplate.queryForObject(querySelectById, id) { rs: ResultSet, rowNum: Int -> mapRow(rs, rowNum) }
+        return kotlin.runCatching {
+            jdbcTemplate.queryForObject(querySelectById, id) { rs: ResultSet, rowNum: Int -> mapRow(rs, rowNum) }
+        }.getOrNull()
     }
 
     fun getByUsername(username: String): User {
@@ -77,7 +79,9 @@ class UserRepository(
     }
 
     fun findByUsername(username: String): User? {
-        return jdbcTemplate.queryForObject(querySelectByUsername, username) { rs: ResultSet, rowNum: Int -> mapRow(rs, rowNum) }
+        return kotlin.runCatching {
+            jdbcTemplate.queryForObject(querySelectByUsername, username) { rs: ResultSet, rowNum: Int -> mapRow(rs, rowNum) }
+        }.getOrNull()
     }
 
     private fun mapRow(rs: ResultSet, rowNum: Int): User? {
