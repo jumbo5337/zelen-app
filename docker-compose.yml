@@ -8,3 +8,11 @@ services:
       POSTGRES_DB: zelen-app
     ports:
      - 5432:5432
+  
+  ${PROJECT}:
+    image: ${PROJECT}:${VERSION}
+    environment:
+      VIRTUAL_PORT: 8080
+      VIRTUAL_HOST: zelen.electrostal.space
+      LETSENCRYPT_HOST: zelen.electrostal.space
+      LETSENCRYPT_EMAIL: gdkharit@electrostal.space
