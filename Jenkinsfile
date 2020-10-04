@@ -34,7 +34,7 @@ node('') {
     }   
 
     stage("Build docker image") {      
-        def dockerImage = docker.build("${PROJECT}:${VERSION}", "--build-arg APP_ARTIFACT=${IMAGE}-${VERSION}-jar-with-dependencies.jar .")
+        def dockerImage = docker.build("${PROJECT}:${VERSION}", "--build-arg APP_ARTIFACT=${IMAGE}-${VERSION}.jar .")
     }
 
     stage("Deploy to docker hphost") {
