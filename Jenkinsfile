@@ -38,7 +38,7 @@ node('') {
     }
 
     stage("Deploy to docker hphost") {
-        docker.image('tmaier/docker-compose').withRun('-v /var/run/docker.sock:/var/run/docker.sock') { c ->
+        docker.image('docker/compose').withRun('-v /var/run/docker.sock:/var/run/docker.sock') { c ->
             sh 'docker-compose pull'
             sh 'docker-compose up -d --force-recreate'
         }
