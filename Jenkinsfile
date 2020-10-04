@@ -38,11 +38,9 @@ node('') {
     }
 
     stage("Deploy to docker hphost") {
-        docker.image('docker/compose').withRun('-v /var/run/docker.sock:/var/run/docker.sock -e "PROJECT=${PROJECT}" -e "VERSION=${VERSION}"') { c ->
-            docker.image('docker/compose').inside {
-                sh 'docker-compose pull'
-                sh 'docker-compose up -d --force-recreate'
-            }
+        docker.image('docker/compose').inside('-v /var/run/docker.sock:/var/run/docker.sock -e PROJECT=$PROJECT -e VERSION=$VERSION') {
+            sh 'docker-compose pull'
+            sh 'docker-compose up -d --force-recreate'
         }
     }
 
