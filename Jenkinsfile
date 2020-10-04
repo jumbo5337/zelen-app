@@ -39,7 +39,7 @@ node('') {
 
     stage("Deploy to docker hphost") {
         docker.image('docker/compose').inside('-v /var/run/docker.sock:/var/run/docker.sock -e "PROJECT=${PROJECT}" -e "VERSION=${VERSION}"') {
-            sh 'cat dopcker-compose.yml | envsubst | docker-compose pull && docker-compose up -d --force-recreate'
+            sh 'cat docker-compose.yml | envsubst | docker-compose pull && docker-compose up -d --force-recreate'
         }
     }
 
