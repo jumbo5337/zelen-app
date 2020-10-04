@@ -18,7 +18,6 @@ node('') {
     def shortGitCommit = "${gitCommit[0..10]}"
     def previousGitCommit = sh(script: "git rev-parse ${gitCommit}~", returnStdout: true)
 
-    env.DOCKER_PROJECT = 'zelen-app'
     //def dockerfile = 'Dockerfile'
 
     IMAGE = readMavenPom().getArtifactId()
@@ -39,7 +38,8 @@ node('') {
 
     stage("Deploy to docker hphost") {
         docker.image('docker/compose').inside('-v /var/run/docker.sock:/var/run/docker.sock -e "PROJECT=${PROJECT}" -e "VERSION=${VERSION}"') {
-            sh 'cat docker-compose.yml | envsubst | docker-compose pull && docker-compose up -d --force-recreate'
+            sh 'echo ${PROJECT}-${VERSION}'
+            sh 'docker-compose pull && docker-compose up -d --force-recreate'
         }
     }
 
