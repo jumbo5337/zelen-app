@@ -37,12 +37,9 @@ node('') {
     }
 
     stage("Deploy to docker hphost") {
-        docker.withServer('unix:///var/run/docker.sock') {
-            docker.image('docker/compose').inside("-e DOCKER_HOST=unix:///var/run/docker.sock -e PROJECT=${PROJECT} -e VERSION=${VERSION}") {
-                sh 'ls -al /var/run/docker.sock'
-                sh 'chown $(whoami):$(whoami) /var/run/docker.sock'
-                sh 'docker-compose pull && docker-compose up -d --force-recreate'
-            }
+        docker.image('docker/compose').inside("-e PROJECT=${PROJECT} -e VERSION=${VERSION}") {
+            sh 'ls -al /var/run/docker.sock'
+            sh 'docker-compose pull && docker-compose up -d --force-recreate'
         }
     }
 
