@@ -92,12 +92,14 @@ class OperationService(
         val (_, currentBalance) = balanceRepository.getBalance(userId)
         val operation = operationRepository.findById(opId)
                 ?: throw BadOperationException("Operation with id [$opId] doesn't exist")
-        if (operation.opType != OpType.TRANSFER) {
+        if(operation.senderId != userId){
+            throw BadOperationException("Wrong userId for confirmation")
+        } else if (operation.opType != OpType.TRANSFER) {
             throw BadOperationException("Wrong method for transfer")
-        } else if (operation.opState != OpState.CREATED) {
-            throw BadOperationException("Operation is already [${operation.opState}]")
         } else if (currentBalance < abs(operation.income)) {
             throw BadOperationException("Balance is too low for this operation")
+        } else if (operation.opState != OpState.CREATED) {
+            throw BadOperationException("Operation is already [${operation.opState}]")
         }
         val (_, receiverBalance) = balanceRepository.getBalance(operation.receiverId)
         val senderBalance = currentBalance.plus(operation.income)
