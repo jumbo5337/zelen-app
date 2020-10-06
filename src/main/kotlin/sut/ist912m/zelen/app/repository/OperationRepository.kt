@@ -27,7 +27,7 @@ class OperationRepository(
     private val updateQuery = "UPDATE USER_OPERATIONS SET op_state=?, updated=? WHERE  id=?"
     private val selectQuery = "SELECT * FROM USER_OPERATIONS WHERE id=?"
     private val findAllUserOperations = "SELECT DISTINCT * FROM USER_OPERATIONS " +
-            "WHERE sender_id = :id OR receiver_id =:id AND op_type=:type"
+            "WHERE (sender_id = :id OR receiver_id =:id) AND op_type=:type"
 
     fun create(
             senderId: Long,
