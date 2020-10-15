@@ -11,6 +11,7 @@ services:
   
   zelen-app:
     image: ${PROJECT}:${VERSION}
+    network_mode: bridge
     environment:
       VIRTUAL_PORT: 8080
       VIRTUAL_HOST: zelen.electrostal.space
